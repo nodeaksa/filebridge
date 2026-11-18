@@ -6,7 +6,7 @@ import type { Session } from '@supabase/supabase-js';
 
 interface FileItem {
   name: string;
-  id: string;
+  id: string | null;
   created_at: string;
   metadata?: {
     size?: number;
