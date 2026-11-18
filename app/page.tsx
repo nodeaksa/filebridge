@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import type { Session } from '@supabase/supabase-js';
+import type { FileObject } from '@supabase/storage-js';
 
 interface FileItem {
   name: string;
@@ -22,7 +23,7 @@ export default function Home() {
   const [authError, setAuthError] = useState('');
   const [loggingIn, setLoggingIn] = useState(false);
 
-  const [files, setFiles] = useState<FileItem[]>([]);
+  const [files, setFiles] = useState<FileObject[]>([]);
   const [uploading, setUploading] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [statusMsg, setStatusMsg] = useState('');
