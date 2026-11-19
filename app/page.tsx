@@ -71,30 +71,61 @@ export default function Home() {
     }
   };
 
-  const uploadFile = async (file: File) => {
-    if (file.size > 50 * 1024 * 1024) {
-      setStatusMsg('Ukuran file maksimal 50 MB!');
-      return;
-    }
+  const uploadFiles = async (filesToUpload: FileList | File[]) => {
+    const fileArray = Array.from(filesToUpload);
+    if (fileArray.length === 0) return;
 
     setUploading(true);
-    setStatusMsg(`Mengunggah ${file.name}...`);
+    let completed = 0;
+    let successCount = 0;
+    let failCount = 0;
 
-    const cleanName = `${Date.now().toString().slice(-4)}_${file.name.replace(/\s+/g, '_')}`;
+    setStatusMsg(`Mengunggah ${fileArray.length} file... (0/${fileArray.length})`);
 
-    const { error } = await supabase.storage
-      .from('loker-file')
-      .upload(cleanName, file, { upsert: true });
+    const uploadPromises = fileArray.map(async (file, idx) => {
+      if (file.size > 50 * 1024 * 1024) {
+        completed++;
+        failCount++;
+        setStatusMsg(`Mengunggah... (${completed}/${fileArray.length})`);
+        return { success: false, name: file.name, error: 'Ukuran melebihi 50 MB' };
+      }
 
-    if (error) {
-      setStatusMsg(`Gagal upload: ${error.message}`);
+      const timestamp = Date.now().toString().slice(-4);
+      const salt = Math.random().toString(36).substring(2, 6);
+      const cleanName = `${timestamp}_${idx}_${salt}_${file.name.replace(/\s+/g, '_')}`;
+
+      const { error } = await supabase.storage
+        .from('loker-file')
+        .upload(cleanName, file, { upsert: true });
+
+      completed++;
+      if (error) {
+        failCount++;
+      } else {
+        successCount++;
+      }
+      setStatusMsg(`Mengunggah... (${completed}/${fileArray.length})`);
+
+      return { success: !error, name: file.name, error: error?.message };
+    });
+
+    await Promise.all(uploadPromises);
+
+    if (failCount === 0) {
+      setStatusMsg(
+        fileArray.length === 1
+          ? 'Berhasil diunggah!'
+          : `Semua ${successCount} file berhasil diunggah!`
+      );
+    } else if (successCount === 0) {
+      setStatusMsg(`Gagal mengunggah semua file (${failCount} gagal).`);
     } else {
-      setStatusMsg('Berhasil diunggah!');
-      await fetchFiles();
+      setStatusMsg(`Selesai: ${successCount} berhasil, ${failCount} gagal.`);
     }
 
+    await fetchFiles();
     setUploading(false);
-    setTimeout(() => setStatusMsg(''), 3000);
+    setTimeout(() => setStatusMsg(''), 4000);
   };
 
   const handleDownload = async (fileName: string) => {
@@ -212,7 +243,9 @@ export default function Home() {
           onDrop={(e) => {
             e.preventDefault();
             setDragging(false);
-            if (e.dataTransfer.files?.[0]) uploadFile(e.dataTransfer.files[0]);
+            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+              uploadFiles(e.dataTransfer.files);
+            }
           }}
           className={`flex flex-col items-center justify-center border-2 border-dashed rounded-2xl p-8 cursor-pointer transition ${
             dragging
@@ -222,16 +255,22 @@ export default function Home() {
         >
           <input
             type="file"
+            multiple
             className="hidden"
             disabled={uploading}
             onChange={(e) => {
-              if (e.target.files?.[0]) uploadFile(e.target.files[0]);
+              if (e.target.files && e.target.files.length > 0) {
+                uploadFiles(e.target.files);
+                e.target.value = '';
+              }
             }}
           />
           <p className="text-sm font-medium text-zinc-200">
             {uploading ? 'Sedang mengunggah...' : 'Klik atau seret file ke sini'}
           </p>
-          <p className="text-xs text-zinc-500 mt-1">Maksimal 50 MB per file</p>
+          <p className="text-xs text-zinc-500 mt-1">
+            Bisa pilih banyak file sekaligus • Maksimal 50 MB per file
+          </p>
           {statusMsg && <p className="text-xs text-blue-400 mt-3">{statusMsg}</p>}
         </label>
 
