@@ -207,8 +207,15 @@ export default function Home() {
       <div className="max-w-2xl mx-auto space-y-6">
         <header className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+            <img
+              src="/logo.jpeg"
+              alt="FileBridge logo"
+              className="w-8 h-8 rounded-lg object-cover"
+            />
             <h1 className="text-lg font-bold tracking-tight">FileBridge.</h1>
+            <span className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-zinc-800/80 text-zinc-400 select-none">
+              v1.1.6
+            </span>
           </div>
           <div className="flex items-center gap-3">
             <button

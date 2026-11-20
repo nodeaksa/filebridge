@@ -1,11 +1,12 @@
 <div align="center">
 
-<img src="./app/icon.svg" alt="azurefile logo" width="80" height="80"/>
+<img src="./public/logo.jpeg" alt="FileBridge logo" width="100" height="100" style="border-radius:16px"/>
 
 # azurefile
 
 **Your minimal, private file locker — upload, download, and manage files from anywhere.**
 
+[![Version](https://img.shields.io/badge/version-v1.1.6-brightgreen)](https://github.com/nodeaksa/filebridge/releases/tag/v1.1.6)
 [![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js&logoColor=white)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
