@@ -3,15 +3,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import type { Session } from '@supabase/supabase-js';
-
-interface FileItem {
-  name: string;
-  id: string | null;
-  created_at: string;
-  metadata?: {
-    size?: number;
-  };
-}
+import type { FileObject } from '@supabase/storage-js';
 
 export default function Home() {
   const [session, setSession] = useState<Session | null>(null);
@@ -22,7 +14,7 @@ export default function Home() {
   const [authError, setAuthError] = useState('');
   const [loggingIn, setLoggingIn] = useState(false);
 
-  const [files, setFiles] = useState<any[]>([]);
+  const [files, setFiles] = useState<FileObject[]>([]);
   const [uploading, setUploading] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [statusMsg, setStatusMsg] = useState('');
@@ -147,7 +139,7 @@ export default function Home() {
     }
   };
 
-  const formatSize = (bytes?: number) => {
+  const formatSize = (bytes?: number | null) => {
     if (!bytes) return '';
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
     return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
